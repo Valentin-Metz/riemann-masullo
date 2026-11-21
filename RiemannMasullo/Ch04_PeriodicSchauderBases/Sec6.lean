@@ -258,7 +258,9 @@ theorem mem_modulatedPeriodicSpectrum_iff (ξ : PontryaginDual G) :
 Every character in the fiber for a twice-repeated generator has multiplicity two. -/
 theorem modulatedPeriodicMultiplicity_repeat (ξ : PontryaginDual G)
     (hξ : ξ ∈ modulatedCyclicAnnihilatorFiber m ω γ) :
-    modulatedPeriodicMultiplicity m ω (fun _ : Fin 2 ↦ γ) ξ = 2 := by sorry
+    modulatedPeriodicMultiplicity m ω (fun _ : Fin 2 ↦ γ) ξ = 2 := by
+  classical
+  simp [modulatedPeriodicMultiplicity, hξ]
 
 variable (hγs : ∀ k, 1 < (m (γs k)).val)
 
