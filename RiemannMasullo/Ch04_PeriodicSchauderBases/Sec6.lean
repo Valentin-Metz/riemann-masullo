@@ -458,7 +458,31 @@ a lattice zero equals the derivative of the numerator divided by the
 logarithm of the generator. -/
 theorem repeatedCyclicDifference_mellin_division_eval (f : A) (n : ℤ) :
     let z : ℂ := ((2 * Real.pi * (n : ℝ) / Real.log (a.val : ℝ) : ℝ) : ℂ) * Complex.I
-    f.val z = deriv (T f).val z / (Real.log (a.val : ℝ) : ℂ) := by sorry
+    f.val z = deriv (T f).val z / (Real.log (a.val : ℝ) : ℂ) := by
+  intro z
+  let L : ℝ := Real.log (a.val : ℝ)
+  have hL : L ≠ 0 := (Real.log_pos (by exact_mod_cast ha)).ne'
+  have hLc : (L : ℂ) ≠ 0 := by exact_mod_cast hL
+  have hz : -((L : ℂ) * z) = ((-n : ℤ) : ℂ) * (2 * Real.pi * Complex.I) := by
+    dsimp [z, L] at *
+    push_cast
+    field_simp
+    <;> ring
+  have hexp : Complex.exp (-((L : ℂ) * z)) = 1 :=
+    hz ▸ Complex.exp_int_mul_two_pi_mul_I (-n)
+  have hlin : HasDerivAt (fun w : ℂ ↦ -((L : ℂ) * w)) (-(L : ℂ)) z :=
+    ((hasDerivAt_id z).const_mul (L : ℂ)).neg.congr_deriv (by simp)
+  have hfactor : HasDerivAt (fun w : ℂ ↦ 1 - Complex.exp (-((L : ℂ) * w))) (L : ℂ) z := by
+    simpa only [hexp, one_mul, neg_neg, zero_sub] using!
+      (hasDerivAt_const z (1 : ℂ)).sub hlin.cexp
+  have hf : Differentiable ℂ f.val := by
+    apply differentiableOn_univ.mp
+    simpa using f.property.2.1
+  have hderiv : HasDerivAt (T f).val ((L : ℂ) * f.val z) z := by
+    rw [show (T f).val = _ from funext (hT f)]
+    simpa only [hexp, sub_self, zero_mul, add_zero] using!
+      hfactor.mul (hf z).hasDerivAt
+  rw [hderiv.deriv, mul_div_cancel_left₀ _ hLc]
 
 include ha hT in
 /-- Paper: Example 4.6.1.6, p. 218. The normalized Fourier coefficient of
