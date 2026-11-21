@@ -656,8 +656,7 @@ of the interval decay space into ordinary Schwartz–Bruhat functions. -/
 theorem modulatedExponentialDecay_zeroTwist_injective :
     Injective j₀ ∧ ∀ (f : D) (x : G), j₀ f x = f.val x := by
   have h (f : D) (x : G) : j₀ f x = f.val x := by
-    rw [modulatedExponentialDecayTwist_apply]
-    simp
+    exact (modulatedExponentialDecayTwist_apply m I zeroI f x).trans (by simp)
   refine ⟨fun f g hfg ↦ Subtype.ext (funext fun x ↦ ?_), h⟩
   exact (h f x).symm.trans ((congrArg (fun u : S₀ ↦ u x) hfg).trans (h g x))
 
