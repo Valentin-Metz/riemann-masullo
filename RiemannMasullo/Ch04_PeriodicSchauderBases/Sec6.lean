@@ -87,7 +87,17 @@ def modulatedDifferenceProduct (S : List G) :
 A repeated generator gives the second finite difference at every point. -/
 theorem modulatedDifferenceProduct_pair_apply (f : ModulatedExponentialDecay m I) (x : G) :
     (modulatedDifferenceProduct m hm hms I hInt hne [γ, γ] f).val x =
-      f.val x - 2 * f.val (γ * x) + f.val (γ ^ 2 * x) := by sorry
+      f.val x - 2 * f.val (γ * x) + f.val (γ ^ 2 * x) := by
+  let Δ := modulatedCyclicDifference m γ hm hms I hInt hne
+  have eval (g : ModulatedExponentialDecay m I) (y : G) :
+      (Δ g).val y = g.val y - g.val (γ * y) :=
+    modulatedCyclicDifference_apply m γ hm hms I hInt hne g y
+  calc
+    _ = (Δ f).val x - (Δ f).val (γ * x) := eval (Δ f) x
+    _ = (f.val x - f.val (γ * x)) -
+        (f.val (γ * x) - f.val (γ ^ 2 * x)) :=
+      congrArg₂ (· - ·) (eval f x) (by simpa only [pow_two, mul_assoc] using eval f (γ * x))
+    _ = _ := by ring
 
 end Difference
 
