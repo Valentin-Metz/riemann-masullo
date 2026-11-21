@@ -315,7 +315,9 @@ def modulatedLogMoment (ξ : PontryaginDual G) (r : ℕ) : StrongDual ℂ H₀[�
 /-- Paper: Equation (4.6.1.14), p. 212. The zeroth moment at the trivial
 character is the integral of the test function. -/
 theorem modulatedLogMoment_one_zero (f : H₀[ω]) :
-    modulatedLogMoment (m := m) (hm := hm) (hms := hms) (ω := ω) (μ := μ) 1 0 f = ∫ g, f.val.val g ∂μ := by sorry
+    modulatedLogMoment (m := m) (hm := hm) (hms := hms) (ω := ω) (μ := μ) 1 0 f = ∫ g, f.val.val g ∂μ := by
+  change (∫ g, integrand[1, 0, f] g ∂μ) = ∫ g, f.val.val g ∂μ
+  simp
 
 local notation "J" => {p : PontryaginDual G × ℕ // p.2 < modulatedPeriodicMultiplicity m ω γs p.1}
 local notation "S" => List.ofFn γs
