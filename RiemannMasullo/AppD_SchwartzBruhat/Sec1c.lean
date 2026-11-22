@@ -1508,7 +1508,8 @@ theorem bruhatDiffWord_character (w : List (LCATopologicalLie G))
 of its first-order symbols. -/
 theorem bruhatDiffSymbol_word (w : List (LCATopologicalLie G)) (χ : PontryaginDual G) :
     bruhatDiffSymbol (bruhatDiffWord w) χ =
-      (w.map (fun a ↦ bruhatDiffSymbol (bruhatDiffGenerator a) χ)).prod := by sorry
+      (w.map (fun a ↦ bruhatDiffSymbol (bruhatDiffGenerator a) χ)).prod := by
+  simpa [bruhatDiffSymbol] using bruhatDiffWord_character w χ (1 : G)
 
 /-- Paper: Lemma D.1.6.13, p. 769. The symbol is invariant under every
 compact subgroup of the dual. -/
