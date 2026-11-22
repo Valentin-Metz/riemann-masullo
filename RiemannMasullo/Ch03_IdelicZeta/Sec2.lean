@@ -2195,7 +2195,36 @@ theorem homogeneousThetaMellinIntegral_meromorphicContinuation
     (hχ : ∀ g : (ideleClassNorm F).ker, χ g.val = ω g) (M : ℂ → ℂ) :
     (MeromorphicNFOn M univ ∧ EqOn M (fun s ↦
       homogeneousThetaMellinIntegral τ ω f (ideleClassNormTwist χ s)) halfPlane) ↔
-    M = fun s ↦ globalIdelicZFunction f (ideleClassNormTwist χ s) := by sorry
+    M = fun s ↦ globalIdelicZFunction f (ideleClassNormTwist χ s) := by
+  have hstrip (s : ℂ) (hs : 1 < s.re) :
+      ideleClassNormTwist χ s ∈ componentStrip ω (Ioi 1) := by
+    constructor
+    · change 1 < quasiCharacterAbscissa _ _ _ _
+      rwa [quasiCharacterAbscissa_ideleClassNormTwist]
+    · intro g
+      change (χ g.val : ℂ) * (classNormℝ g.val : ℂ) ^ s = (ω g : ℂ)
+      have hn : classNormℝ g.val = 1 := by
+        change (((ideleClassNorm F g.val).val : ℝ≥0) : ℝ) = 1
+        rw [MonoidHom.mem_ker.mp g.property]
+        rfl
+      simp [hn, hχ g]
+  have hZ (s : ℂ) (hs : 1 < s.re) :
+      globalIdelicZFunction f (ideleClassNormTwist χ s) =
+        globalIdelicZetaIntegral f (ideleClassNormTwist χ s) :=
+    globalIdelicZFunction_eq_integral f (hstrip s hs).1
+  have hHom (s : ℂ) (hs : 1 < s.re) :
+      homogeneousThetaMellinIntegral τ ω f (ideleClassNormTwist χ s) =
+        globalIdelicZetaIntegral f (ideleClassNormTwist χ s) :=
+    ((globalThetaMellinIntegral_eq_homogeneous τ ω f hτ) (hstrip s hs)).symm.trans
+      (globalThetaMellinIntegral_eq_idelic f (hstrip s hs).1)
+  constructor
+  · rintro ⟨hM, hEq⟩
+    funext s
+    exact globalIdelicZetaIntegral_chartContinuation_eq f hM
+      (globalIdelicZFunction_meromorphic f χ) (fun z hz ↦ (hEq hz).trans (hHom z hz))
+      hZ (show ideleClassNormTwist χ s = ideleClassNormTwist χ s from rfl)
+  · rintro rfl
+    exact ⟨globalIdelicZFunction_meromorphic f χ, fun s hs ↦ (hZ s hs).trans (hHom s hs).symm⟩
 
 /-- Paper: Theorem 3.2.2.1(3), p. 125. If both zero terms vanish, the global
 Z-function is entire in the norm-twist coordinate of every component. -/
