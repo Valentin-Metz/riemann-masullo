@@ -310,7 +310,8 @@ character, the Poisson term is the log residue size times the norm-one integral.
 theorem orbitalPlacePoissonTerm_trivial_zero (φ : 𝒟) (v : V) (π : (v.adicCompletion F)ˣ) :
     orbitalPlacePoissonTerm 1 φ v π 0 =
       (Real.log (q(v) : ℝ) : ℂ) * ∫ h : C₁, φ.val h.val
-        ∂normOneIdeleClassTamagawaMeasure F := by sorry
+        ∂normOneIdeleClassTamagawaMeasure F := by
+  simp [orbitalPlacePoissonTerm]
 
 /-- Paper: §11.3.1.1(2), p. 494, and (11.3.2.5), p. 496.
 The half-shifted Mellin values at the zeros of the reciprocal Euler product sum,
