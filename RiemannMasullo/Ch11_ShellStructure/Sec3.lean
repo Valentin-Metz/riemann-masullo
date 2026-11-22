@@ -304,7 +304,40 @@ theorem hasSum_divisorialKernelDifference (S : Finset V)
     (_hS : ∀ v ∈ S, ∀ w : V, w.under (𝓞 ℚ) = v.under (𝓞 ℚ) → w ∈ S)
     (K : I𝔽 × I𝔽 → ℂ) (xy : I𝔽 × I𝔽) :
     HasSum (fun k ↦ divisorialKernelDifference S k K xy)
-      ((sLocalDivisorialStratum F S).indicator (fun _ ↦ K xy) xy.2 - K xy) := by sorry
+      ((sLocalDivisorialStratum F S).indicator (fun _ ↦ K xy) xy.2 - K xy) := by
+  classical
+  let a : ℕ → ℂ := fun k ↦ divisorialIndicator (primaryDivisorialPlaces F S k) xy.2
+  let b := (sLocalDivisorialStratum F S).indicator (fun _ ↦ (1 : ℂ)) xy.2
+  have hi := iInter_primaryDivisorialStratum S _hS
+  have hmono : Monotone (primaryDivisorialPlaces F S) :=
+    monotone_nat_of_le_succ fun k ↦ by
+      rw [primaryDivisorialPlaces_succ]
+      exact Finset.subset_union_left
+  have htail : ∃ N : ℕ, ∀ k ≥ N, a k = b := by
+    by_cases h : xy.2 ∈ sLocalDivisorialStratum F S
+    · have hall := Set.mem_iInter.mp (hi.symm ▸ h)
+      exact ⟨0, fun k _ ↦ by
+        simp [a, b, divisorialIndicator_eq_indicator, h, hall k]⟩
+    · have hn : ¬ ∀ k, xy.2 ∈ divisorialStratum F (primaryDivisorialPlaces F S k) :=
+        fun hk ↦ h (hi ▸ Set.mem_iInter.mpr hk)
+      push_neg at hn
+      obtain ⟨N, hN⟩ := hn
+      refine ⟨N, fun k hk ↦ ?_⟩
+      have hk' : xy.2 ∉ divisorialStratum F (primaryDivisorialPlaces F S k) :=
+        fun hg ↦ hN (fun v hv ↦ hg v (hmono hk hv))
+      simp [a, b, divisorialIndicator_eq_indicator, h, hk']
+  obtain ⟨N, hN⟩ := htail
+  have hs : HasSum (fun k ↦ divisorialKernelDifference S k K xy)
+      (∑ k ∈ Finset.range N, divisorialKernelDifference S k K xy) :=
+    hasSum_sum_of_ne_finset_zero fun k hk ↦ by
+      have hk' : N ≤ k := Nat.le_of_not_gt (fun h ↦ hk (Finset.mem_range.mpr h))
+      change (a (k + 1) - a k) * K xy = 0
+      rw [hN k hk', hN (k + 1) (hk'.trans (Nat.le_succ k)), sub_self, zero_mul]
+  change HasSum _ ((∑ k ∈ Finset.range N, (a (k + 1) - a k) * K xy)) at hs
+  rw [← Finset.sum_mul, Finset.sum_range_sub a, hN N le_rfl] at hs
+  have ha : a 0 = 1 := by simp [a, primaryDivisorialPlaces, divisorialIndicator]
+  rw [ha, sub_mul, one_mul] at hs
+  by_cases h : xy.2 ∈ sLocalDivisorialStratum F S <;> simpa [b, h] using hs
 
 section OrbitalTraces
 
