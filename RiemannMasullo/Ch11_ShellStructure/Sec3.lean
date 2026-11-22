@@ -388,7 +388,8 @@ theorem orbitalSectionWeight_skewIntegral_eq_zero (E : Set N𝔽) (τ : ℝ≥0�
     (∑' ξ : Fˣ, ∫ t, ∫ g in E,
       let xy := (τ t, principal ξ * g.val * τ t)
       (orbitalSectionWeight E τ xy : ℂ) * K xy
-      ∂normOneIdeleTamagawaMeasure F ∂positiveRealHaar) = 0 := by sorry
+      ∂normOneIdeleTamagawaMeasure F ∂positiveRealHaar) = 0 := by
+  simp [orbitalSectionWeight_eq_zero E τ _hτ]
 
 -- TODO(paper-gap): Theorem 11.3.2.1 (11.3.2.1) cannot use the weight (11.3.2.2).
 -- A normalized lift and a shell-by-shell identification with the trace operator
