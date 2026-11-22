@@ -1452,14 +1452,6 @@ theorem globalIdelicZFunction_residue_zero (f : ℬ[F]) :
       (𝓝[≠] 0)
       (𝓝 (-((normOneIdeleClassTamagawaMeasure F univ).toReal : ℂ) * f zeroAdele)) := by sorry
 
-/-- Paper: Theorem 3.2.2.1(1)(a), p. 124. The residue at the norm character
-is the norm-one class volume times the Fourier transform evaluated at zero. -/
-theorem globalIdelicZFunction_residue_one (f : ℬ[F]) :
-    Tendsto (fun s : ℂ ↦ (s - 1) * globalIdelicZFunction f (ideleClassNormTwist (1 : U[F]) s))
-      (𝓝[≠] 1)
-      (𝓝 (((normOneIdeleClassTamagawaMeasure F univ).toReal : ℂ) *
-        adeleSchwartzFourier f zeroAdele)) := by sorry
-
 /-- Paper: Theorem 3.2.2.1(1)(b), p. 124. Fourier transforming the test function
 and taking the norm times the inverse character preserves its global Z-function value. -/
 theorem globalIdelicZFunction_functionalEquation (f : ℬ[F]) (c : 𝒳[F]) :
@@ -1552,6 +1544,31 @@ private theorem dualQuasiCharacter_ideleClassNormTwist (χ : U[F]) (s : ℂ) :
   change N * ((χ g : ℂ) * N ^ s)⁻¹ = (χ g : ℂ)⁻¹ * N ^ (1 - s)
   rw [mul_inv_rev, Complex.cpow_sub 1 s hN, Complex.cpow_one, div_eq_mul_inv]
   ac_rfl
+
+/-- Paper: Theorem 3.2.2.1(1)(a), p. 124. The residue at the norm character
+is the norm-one class volume times the Fourier transform evaluated at zero. -/
+theorem globalIdelicZFunction_residue_one (f : ℬ[F]) :
+    Tendsto (fun s : ℂ ↦ (s - 1) * globalIdelicZFunction f (ideleClassNormTwist (1 : U[F]) s))
+      (𝓝[≠] 1)
+      (𝓝 (((normOneIdeleClassTamagawaMeasure F univ).toReal : ℂ) *
+        adeleSchwartzFourier f zeroAdele)) := by
+  have hreflect : Tendsto (fun s : ℂ ↦ 1 - s) (𝓝[≠] 1) (𝓝[≠] 0) := by
+    apply tendsto_nhdsWithin_iff.mpr
+    refine ⟨?_, ?_⟩
+    · have hc : ContinuousAt (fun s : ℂ ↦ 1 - s) 1 :=
+        (continuous_const.sub continuous_id).continuousAt
+      have ht : Tendsto (fun s : ℂ ↦ 1 - s) (𝓝 1) (𝓝 (1 - 1)) := hc.tendsto
+      simpa only [sub_self] using ht.mono_left nhdsWithin_le_nhds
+    · filter_upwards [self_mem_nhdsWithin] with s hs
+      exact fun he ↦ hs (sub_eq_zero.mp he).symm
+  have h := ((globalIdelicZFunction_residue_zero (adeleSchwartzFourier f)).comp hreflect).neg
+  rw [neg_mul, neg_neg] at h
+  refine h.congr fun s ↦ ?_
+  have hZ := globalIdelicZFunction_functionalEquation f (ideleClassNormTwist (1 : U[F]) s)
+  rw [dualQuasiCharacter_ideleClassNormTwist, inv_one] at hZ
+  change -((1 - s) * globalIdelicZFunction (adeleSchwartzFourier f)
+    (ideleClassNormTwist (1 : U[F]) (1 - s))) = _
+  rw [← hZ, ← neg_mul, neg_sub]
 
 /-- Paper: Proposition 3.2.1.3(3), p. 123. Reflecting the continuation of the
 inverse unitary character gives the original continuation times a nowhere-vanishing
