@@ -78,6 +78,19 @@ The global orbital quotient carries the quotient topology of the pole-free theta
 abbrev StrongCoprimalityQuotient (ω : PontryaginDual C₁) (S : Finset V) :=
   StrongCoprimalityThetaSpace ω ⧸ strongCoprimalityDenominator ω S
 
+private theorem mkQ_span_range_eq_zero {E M : Type*} [AddCommGroup E] [AddCommGroup M]
+    [Module ℂ E] [Module ℂ M] (L : E →ₗ[ℂ] M) (x : M) :
+    (Submodule.span ℂ (Set.range L)).mkQ x = 0 ↔ ∃ y, x = L y := by
+  have hle : Submodule.span ℂ (Set.range L) ≤ LinearMap.range L :=
+    Submodule.span_le.mpr Set.Subset.rfl
+  rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
+  constructor
+  · intro hx
+    obtain ⟨y, hy⟩ := hle hx
+    exact ⟨y, hy.symm⟩
+  · rintro ⟨y, hy⟩
+    exact Submodule.subset_span ⟨y, hy.symm⟩
+
 /-- Paper: Equation (7.5.0.3), p. 375.
 A theta class represents zero in the quotient exactly when a principal-value test
 represents that same theta class. -/
@@ -86,7 +99,10 @@ theorem strongCoprimalityQuotient_mk_eq_zero (ω : PontryaginDual C₁) (S : Fin
     (strongCoprimalityDenominator ω S).mkQ ((K(ω)).mkQ f) = 0 ↔
       ∃ g : P, (K(ω)).mkQ f = (K(ω)).mkQ
         ⟨adelePrincipalValue F S g.val, strongCoprimalityPrincipalValue_mem_polar S g⟩ :=
-  by sorry
+  by
+    let A : P →ₗ[ℂ] P := ((adelePrincipalValue F S).domRestrict P).codRestrict P
+      (strongCoprimalityPrincipalValue_mem_polar S)
+    exact mkQ_span_range_eq_zero (((K(ω)).mkQ).comp A) ((K(ω)).mkQ f)
 
 /-- Paper: Theorem 7.5.0.1, p. 374.
 The class norm used for the comparison is the surjective modulation of §D.2. -/
