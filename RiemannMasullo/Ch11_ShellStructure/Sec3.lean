@@ -360,7 +360,22 @@ theorem finite_support_orbitalPlacePoisson (χ : PontryaginDual C𝔽) (φ : �
     (_hφ : tsupport φ.val ⊆ {g : C𝔽 | 1 < ((ideleClassNorm F g).val : ℝ)})
     (π : ∀ v : V, (v.adicCompletion F)ˣ)
     (_hπ : ∀ v, Valued.v.IsUniformizer (π v : v.adicCompletion F)) :
-    {v : V | ∃ n : ℤ, orbitalPlacePoissonTerm χ φ v (π v) n ≠ 0}.Finite := by sorry
+    {v : V | ∃ n : ℤ, orbitalPlacePoissonTerm χ φ v (π v) n ≠ 0}.Finite := by
+  let normReal : C𝔽 → ℝ := fun g ↦ ((ideleClassNorm F g).val : ℝ)
+  have hc : Continuous normReal :=
+    NNReal.continuous_coe.comp (Units.continuous_val.comp (isProperMap_ideleClassNorm F).continuous)
+  have hcomp : IsCompact (tsupport φ.val) := φ.property.2
+  obtain ⟨B, hB⟩ := hcomp.bddAbove_image hc.continuousOn
+  obtain ⟨N, hN⟩ := exists_nat_gt B
+  refine (Ring.HasFiniteQuotients.finite_absNorm_heightOneSpectrum_le (S := 𝓞 F) N).subset ?_
+  intro v hv
+  change q(v) ≤ N
+  by_contra! hNv
+  obtain ⟨n, hn⟩ := hv
+  apply hn
+  apply orbitalPlacePoissonTerm_eq_zero χ φ v (π v) (_hπ v) _ n
+  intro g hg
+  exact ⟨_hφ hg, (hB ⟨g, hg, rfl⟩).trans_lt (hN.trans (by exact_mod_cast hNv))⟩
 
 /-- Paper: (11.3.2.2), p. 495. The printed weight averages products of the
 two translated section indicators over the norm-one fundamental domain and
