@@ -192,7 +192,10 @@ belongs to the image after adding the new place. -/
 theorem strongCoprimalityLayer_mk_eq_zero (ω : PontryaginDual C₁) (S : Finset V) (v : V)
     (x : strongCoprimalityDenominator ω S) :
     (Submodule.Quotient.mk x : StrongCoprimalityLayer ω S v) = 0 ↔
-      x.val ∈ strongCoprimalityDenominator ω (insert v S) := by sorry
+      x.val ∈ strongCoprimalityDenominator ω (insert v S) :=
+  Submodule.Quotient.mk_eq_zero
+    ((strongCoprimalityDenominator ω (insert v S)).comap
+      (strongCoprimalityDenominator ω S).subtype)
 
 -- TODO(paper-gap): The references to (8.1.0.4), (8.1.0.5), (8.1.0.7), and
 -- (8.1.0.8) in the proof point to local formulas (7.5.0.5), (7.5.0.6),
