@@ -300,7 +300,10 @@ theorem sLocalHomogeneousThetaSpace_complete (χ : PontryaginDual (J₁(S))) :
 
 /-- Paper: Theorem 5.2.3.1(2), p. 233.
 The global homogeneous quotient is nuclear. -/
-theorem globalHomogeneousThetaSpace_nuclear : IsNuclearTVS Θ𝔽ω(ω) := by sorry
+theorem globalHomogeneousThetaSpace_nuclear : IsNuclearTVS Θ𝔽ω(ω) := by
+  have : IsClosed (K𝔽ω(ω) : Set ℬ𝔽) := homogeneousAdelicTheta_ker_isClosed ω
+  let : T2Space Θ𝔽ω(ω) := inferInstance
+  exact isNuclearTVS_quotient (adeleSchwartz_nuclear (F := F)).2 (K𝔽ω(ω))
 
 /-- Paper: Theorem 5.2.3.1(2), p. 233.
 The S-local homogeneous quotient is nuclear. -/
