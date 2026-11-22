@@ -595,7 +595,59 @@ compactly supported locally constant tests, consistently with Remark 2.1.2.1. -/
 theorem exists_finitePlaceSchwartz_zeroExtension_iff (v : V) (h : (v.adicCompletion F)ˣ → ℂ) :
     (∃ f : ℬ(v.adicCompletion F), f (Multiplicative.ofAdd 0) = 0 ∧
       ∀ u : (v.adicCompletion F)ˣ, f (Multiplicative.ofAdd u.val) = h u) ↔
-      IsLocallyConstant h ∧ HasCompactSupport h := by sorry
+      IsLocallyConstant h ∧ HasCompactSupport h := by
+  classical
+  let K := v.adicCompletion F
+  let j : Kˣ → K := Units.val
+  have hj : IsOpenEmbedding j := Units.isOpenEmbedding_val
+  have hn : (0 : K) ∉ Set.range j := by
+    rintro ⟨u, hu⟩
+    exact u.ne_zero hu
+  constructor
+  · rintro ⟨f, hzero, hh⟩
+    let g : K → ℂ := fun x ↦ f (Multiplicative.ofAdd x)
+    have hg := (mem_finitePlaceSchwartz_iff F v g).mp ⟨f, fun _ ↦ rfl⟩
+    have he : h = g ∘ j := funext fun u ↦ (hh u).symm
+    refine ⟨he.symm ▸ hg.1.comp_continuous hj.continuous, ?_⟩
+    have hc : IsCompact (Function.support g) := by
+      have hs : IsClosed (Function.support g) := (hg.1.isOpen_fiber 0).isClosed_compl
+      simpa only [tsupport, hs.closure_eq] using (show IsCompact (tsupport g) from hg.2)
+    have hr : Function.support g ⊆ Set.range j := by
+      intro x hx
+      have hx0 : x ≠ 0 := fun h ↦ hx (h ▸ hzero)
+      exact ⟨Units.mk0 x hx0, rfl⟩
+    apply HasCompactSupport.of_support_subset_isCompact
+      ((hj.isEmbedding.isInducing.isCompact_preimage_iff hr).2 hc)
+    intro u hu
+    exact fun hz ↦ hu ((hh u).symm.trans hz)
+  · rintro ⟨hl, hc⟩
+    let g : K → ℂ := Function.extend j h (fun _ ↦ 0)
+    have he (u : Kˣ) : g (j u) = h u := hj.injective.extend_apply _ _ _
+    have hz {x : K} (hx : x ∉ Set.range j) : g x = 0 :=
+      Function.extend_apply' _ _ _ hx
+    have hk : IsCompact (j '' tsupport h) := hc.image hj.continuous
+    have hs : Function.support g ⊆ j '' tsupport h := by
+      intro x hx
+      by_cases hr : x ∈ Set.range j
+      · obtain ⟨u, rfl⟩ := hr
+        exact ⟨u, subset_tsupport h (fun hu ↦ hx ((he u).trans hu)), rfl⟩
+      · exact False.elim (hx (hz hr))
+    have hl' : IsLocallyConstant g := by
+      rw [IsLocallyConstant.iff_exists_open]
+      intro x
+      by_cases hr : x ∈ Set.range j
+      · obtain ⟨u, rfl⟩ := hr
+        refine ⟨j '' {w | h w = h u}, hj.isOpenMap _ (hl.isOpen_fiber _), ⟨u, rfl, rfl⟩, ?_⟩
+        rintro _ ⟨w, hw, rfl⟩
+        exact (he w).trans (hw.trans (he u).symm)
+      · refine ⟨(j '' tsupport h)ᶜ, hk.isClosed.isOpen_compl, ?_, ?_⟩
+        · rintro ⟨u, _, hu⟩
+          exact hr ⟨u, hu⟩
+        · intro y hy
+          exact (not_not.mp (fun hy' ↦ hy (hs hy'))).trans (hz hr).symm
+    obtain ⟨f, hf⟩ :=
+      (mem_finitePlaceSchwartz_iff F v g).mpr ⟨hl', HasCompactSupport.of_support_subset_isCompact hk hs⟩
+    exact ⟨f, (hf 0).trans (hz hn), fun u ↦ (hf (j u)).trans (he u)⟩
 
 /-- Paper: Definition 5.3.4.1, p. 259.
 The finite-place conditions are the kernels of evaluation at adeles with a zero
