@@ -2,6 +2,7 @@ module
 
 public import RiemannMasullo.Ch05_ThetaZSpaces.Sec2
 public import RiemannMasullo.Ch04_PeriodicSchauderBases.Sec3b
+import RiemannMasullo.ForMathlib.Topology.Algebra.Module.StrongDualQuotient
 
 /-! # Homogeneous theta spaces and Fourier descent
 
@@ -320,7 +321,10 @@ theorem sLocalHomogeneousThetaSpace_montel (χ : PontryaginDual (J₁(S))) :
 /-- Paper: Theorem 5.2.3.1(2), p. 233.
 The strong dual of the global homogeneous quotient is complete. -/
 theorem globalHomogeneousThetaSpace_strongDual_complete :
-    CompleteSpace (StrongDual ℂ Θ𝔽ω(ω)) := by sorry
+    CompleteSpace (StrongDual ℂ Θ𝔽ω(ω)) := by
+  let : CompleteSpace (StrongDual ℂ (SchwartzBruhat (Multiplicative (𝔸[F])))) :=
+    (adeleSchwartz_strongDual_complete (F := F)).2
+  exact completeSpace_strongDual_quotient _
 
 /-- Paper: Theorem 5.2.3.1(2), p. 233.
 The strong dual of the S-local homogeneous quotient is complete. -/
