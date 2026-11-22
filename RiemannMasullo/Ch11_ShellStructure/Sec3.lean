@@ -275,7 +275,24 @@ descending primary strata is the S-local idelic region. -/
 theorem iInter_primaryDivisorialStratum (S : Finset V)
     (_hS : ∀ v ∈ S, ∀ w : V, w.under (𝓞 ℚ) = v.under (𝓞 ℚ) → w ∈ S) :
     (⋂ k, divisorialStratum F (primaryDivisorialPlaces F S k)) =
-      sLocalDivisorialStratum F S := by sorry
+      sLocalDivisorialStratum F S := by
+  have hplaces := iUnion_primaryDivisorialPlaces S _hS
+  ext g
+  rw [Set.mem_iInter]
+  change (∀ k v, v ∈ primaryDivisorialPlaces F S k → Valued.v (g.val.2 v) = 1) ↔
+    ∀ v ∉ S, Valued.v (g.val.2 v) = 1
+  constructor
+  · intro hg v hv
+    have hu : v ∈ ⋃ k, (primaryDivisorialPlaces F S k : Set V) := by
+      rw [hplaces]
+      exact hv
+    obtain ⟨k, hk⟩ := Set.mem_iUnion.mp hu
+    exact hg k v hk
+  · intro hg k v hv
+    apply hg v
+    have hu : v ∈ ⋃ k, (primaryDivisorialPlaces F S k : Set V) :=
+      Set.mem_iUnion.mpr ⟨k, hv⟩
+    rwa [hplaces] at hu
 
 /-- Paper: §11.3.1.1, p. 491 and (11.3.1.4), p. 494. The differences telescope
 pointwise to the S-local restriction minus the original kernel. For each pair
