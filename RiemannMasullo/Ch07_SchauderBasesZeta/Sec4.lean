@@ -374,7 +374,19 @@ A test represents zero in the archimedean quotient exactly when its theta class
 has an archimedean-flat zero-moment representative. -/
 theorem archNuclearityQuotient_mk_eq_zero (f : P) :
     (archNuclearityDenominator χ).mkQ mkΘ(χ, f) = 0 ↔
-      ∃ g : P, g.val ∈ globalArchimedeanFlatTests F (ω(χ) = 1) ∧ mkΘ(χ, g) = mkΘ(χ, f) := by sorry
+      ∃ g : P, g.val ∈ globalArchimedeanFlatTests F (ω(χ) = 1) ∧ mkΘ(χ, g) = mkΘ(χ, f) := by
+  let A : Submodule ℂ P := (globalArchimedeanFlatTests F (ω(χ) = 1)).comap (P).subtype
+  let q : P →ₗ[ℂ] Θ₀(χ) := (Π(χ)).mkQ
+  have hle : archNuclearityDenominator χ ≤ A.map q :=
+    Submodule.span_le.mpr (by
+      rintro _ ⟨g, hg, rfl⟩
+      exact ⟨g, hg, rfl⟩)
+  constructor
+  · intro hf
+    exact hle ((Submodule.Quotient.mk_eq_zero (archNuclearityDenominator χ)).mp hf)
+  · rintro ⟨g, hg, he⟩
+    exact (Submodule.Quotient.mk_eq_zero (archNuclearityDenominator χ)).mpr
+      (Submodule.subset_span ⟨g, hg, he.symm⟩)
 
 -- The finite factors of (7.4.3.6) on p. 369 also carry their integer-unit
 -- Tamagawa masses. A positive archimedean bump on the trivial isotype needs a
