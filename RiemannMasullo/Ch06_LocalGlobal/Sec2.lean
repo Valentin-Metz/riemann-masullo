@@ -797,7 +797,18 @@ theorem globalThetaIsotypeSum_dense :
     letI := Classical.decEq (PontryaginDual C₁)
     letI := locallyConvexFinalTopology (DirectSum.lof ℂ _ X)
     let i := DirectSum.toModule ℂ _ Θ𝔽 (fun ω ↦ (E𝔽(ω)).subtype)
-    Continuous i ∧ Injective i ∧ DenseRange i := by sorry
+    Continuous i ∧ Injective i ∧ DenseRange i := by
+  let : T2Space C₁ := (ideleClassGroup_finiteness F).2.2.1
+  let : CompactSpace C₁ := (ideleClassGroup_finiteness F).2.1
+  let : T2Space Θ𝔽 := globalAdelicThetaSpace_t2_of_isClosed
+    (adelicTheta_ker_isClosed (F := F))
+  let : PolynormableSpace ℂ Θ𝔽 := globalAdelicThetaSpace_polynormable
+  let : IsTopologicalAddGroup Θ𝔽 := PolynormableSpace.isTopologicalAddGroup ℂ _
+  let : ContinuousSMul ℂ Θ𝔽 := PolynormableSpace.continuousSMul ℂ _
+  with_reducible_and_instances
+    exact sLocalThetaIsotypeSum_dense_aux (H := IdeleClassGroup (𝓞 F) F) (E := Θ𝔽)
+      (ideleClassNorm F).ker (globalAdelicThetaSpace_complete (F := F)) ρ𝔽
+      (existsUnique_globalThetaAction (F := F)).exists.choose_spec.1
 
 /-- The generating seminorms for the final locally convex topology are tested on each stage. -/
 private theorem globalThetaIsotypeSum_finalTopology_withSeminorms {K Z : Type*} {Y : K → Type*}
